@@ -1,0 +1,13 @@
+# Keep shell scripts and Docker-related files Linux-friendly, even on Windows.
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.ini text eol=lf
+*.htaccess text eol=lf
+*.md text eol=lf
+.env.example text eol=lf
+.dockerignore text eol=lf
+
+# Treat archives as binary.
+*.zip binary

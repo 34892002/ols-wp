@@ -1,0 +1,1 @@
+mariadb-dump -u root -p123456 wp > backup_db.sql

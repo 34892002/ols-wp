@@ -1,0 +1,21 @@
+services:
+  ols-wp:
+    build:
+      context: .
+      args:
+        WORDPRESS_TEMPLATE: ${WORDPRESS_TEMPLATE:-template/latest.tar.gz}
+        WORDPRESS_TEMPLATE_SQL: ${WORDPRESS_TEMPLATE_SQL:-sql/latest.sql}
+    image: ${IMAGE_NAME:-ols-wp:latest}
+    container_name: ${CONTAINER_NAME:-ols-wp}
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+      # OpenLiteSpeed WebAdmin，生产环境建议不要暴露到公网
+      - "${OLS_ADMIN_PORT:-7080}:7080"
+    volumes:
+      - wordpress-data:/var/www/vhosts/localhost/html
+
+volumes:
+  wordpress-data:
