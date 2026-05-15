@@ -16,6 +16,7 @@ services:
       - "${OLS_ADMIN_PORT:-7080}:7080"
     volumes:
       - wordpress-data:/var/www/vhosts/localhost/html
+      - wordpress-log:/usr/local/lsws/logs
 
 volumes:
   wordpress-data:

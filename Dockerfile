@@ -30,6 +30,7 @@ RUN mkdir -p /docker-entrypoint-initdb.d; \
 COPY scripts/docker-entrypoint.sh /usr/local/bin/ols-wp-entrypoint
 COPY conf/ols/wordpress.htaccess ${WP_ROOT}/.htaccess
 COPY conf/php/wordpress.ini /tmp/wordpress.ini
+COPY conf/ols/admin/conf/htpasswd /usr/local/lsws/admin/conf/htpasswd
 
 RUN set -eux; \
     sed -i 's/\r$//' /usr/local/bin/ols-wp-entrypoint /docker-entrypoint-initdb.d/init.sql; \
