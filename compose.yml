@@ -6,8 +6,8 @@ services:
         OLS_VERSION: ${OLS_VERSION:-1.9.0-lsphp85}
         WORDPRESS_TEMPLATE: ${WORDPRESS_TEMPLATE:-template/latest.tar.gz}
         WORDPRESS_TEMPLATE_SQL: ${WORDPRESS_TEMPLATE_SQL:-sql/latest.sql}
-    image: ${IMAGE_NAME:-ols-wp:latest}
-    container_name: ${CONTAINER_NAME:-ols-wp}
+    image: ${SITE_NAME:-ols-wp}:latest
+    container_name: ${SITE_NAME:-ols-wp}
     restart: unless-stopped
     env_file:
       - .env
@@ -25,5 +25,5 @@ services:
           memory: 1024m     # 最高内存占用
 
 volumes:
-  wordpress-data:
-  wordpress-log:
+  wp-data:
+  wp-log:
