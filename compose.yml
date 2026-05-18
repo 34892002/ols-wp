@@ -21,8 +21,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'      # 最高占用 1.5 个核心
-          memory: 600m     # 最高占用 600m
+          cpus: '1.5'       # 最高CPU占用1.5个核心
+          memory: 1024m     # 最高内存占用
 
 volumes:
   wordpress-data:

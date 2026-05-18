@@ -54,7 +54,8 @@
 - `sql/`：本地数据库初始化 SQL 目录，例如 `latest.sql`、`woostify.sql`
 - `scripts/docker-entrypoint.sh`：启动入口脚本，负责数据库检查、SQL 导入、`wp-config.php` 生成
 - `conf/ols/wordpress.htaccess`：WordPress rewrite 与基础防护
-- `conf/php/wordpress.ini`：WordPress 常用 PHP 参数
+- `conf/ols/conf/httpd_config.conf`：OpenLiteSpeed 全局配置，包含 `lsphp` 进程内存限制
+- `conf/ols/vhosts/vhconf.conf`：站点级 PHP 配置，包含 `memory_limit`
 - `test/wp-config-sample.php.txt`：用于测试 `wp-config.php` 生成逻辑的样本文件
 
 ## 快速开始
@@ -111,18 +112,27 @@
 | `WORDPRESS_SITEURL` | 空 | 固定站点 URL |
 | `WORDPRESS_CONFIG_EXTRA` | 空 | 追加到 `wp-config.php` 受管配置块中的自定义 PHP 配置 |
 
-## PHP 配置
+## PHP 与 OLS 资源配置
 
-镜像内置了 WordPress 优化的 PHP 配置（`conf/php/wordpress.ini`）：
+镜像内的 PHP 与 OpenLiteSpeed 相关限制主要分布在两处：
 
-- `upload_max_filesize = 64M` - 上传文件大小限制
-- `post_max_size = 64M` - POST 数据大小限制
-- `memory_limit = 256M` - PHP 内存限制
+- `conf/ols/vhosts/vhconf.conf`：站点级 PHP 配置
+- `conf/ols/conf/httpd_config.conf`：OpenLiteSpeed 全局配置，包含 `lsphp` 进程限制、请求体大小限制和内存缓冲配置
+
+当前实际生效的关键配置为：
+
+- `memory_limit = 512M` - PHP 单请求内存限制
+- `lsphp memSoftLimit = 512M` - OLS `lsphp` 进程软限制
+- `lsphp memHardLimit = 512M` - OLS `lsphp` 进程硬限制
+- `inMemBufSize = 50M` - OLS 内存缓冲大小
+- `maxReqBodySize = 512M` - OLS 请求体大小上限
+- `upload_max_filesize = 256M` - PHP 上传文件大小限制
+- `post_max_size = 256M` - PHP POST 数据大小限制
 - `max_execution_time = 300` - 脚本最大执行时间（秒）
 - `max_input_vars = 3000` - 最大输入变量数
 - `expose_php = Off` - 隐藏 PHP 版本信息
 
-这些配置在构建时自动应用到 LSPHP。
+> 注意：`memory_limit = 512M` 和 `lsphp memHardLimit = 512M` 已经比较接近 `compose.yml` 里 `600m` 的容器内存上限。该配置适合需要较高单请求内存的 WordPress 场景，但如果插件较重、并发较高或出现 OOM，应优先考虑下调 PHP/LSAPI 内存限制，或提高容器内存上限。
 
 ## 安全加固
 
