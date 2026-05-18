@@ -1,0 +1,29 @@
+services:
+  ols-wp:
+    image: liohao/ols-wp-woostify:latest
+    container_name: ${SITE_NAME:-ols-wp}
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+      # OpenLiteSpeed WebAdmin，生产环境建议不要暴露到公网
+      - "${OLS_ADMIN_PORT:-7080}:7080"
+    volumes:
+      - wp-data:/var/www/vhosts/localhost/html
+      - wp-log:/usr/local/lsws/logs
+    networks:
+      - 1panel-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'       # 最高CPU占用1.5个核心
+          memory: 1024m     # 最高内存占用
+
+volumes:
+  wp-data:
+  wp-log:
+
+networks:
+  1panel-network:
+    external: true

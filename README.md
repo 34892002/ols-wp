@@ -13,6 +13,28 @@
 - 使用 `.ols-wp-initialized` 作为初始化完成标记
 - 自动写入数据库连接、WordPress salts、反向代理 HTTPS 检测等配置
 
+## 单独编译docker
+```bash
+docker build \
+  --build-arg OLS_VERSION=1.9.0-lsphp85 \
+  --build-arg WORDPRESS_TEMPLATE=template/woostify.tar.gz \
+  --build-arg WORDPRESS_TEMPLATE_SQL=sql/woostify.sql \
+  -t yourname/ols-wp-woostify:latest \
+  .
+
+# docker login
+# docker push yourname/ols-wp-woostify:latest
+# image: yourname/ols-wp-woostify:latest
+```
+
+## 1panel
+
+使用 1p_compose.yml 和 1p.env
+
+## dpaneel
+
+上传目录服务器编译或者使用 1p_compose.yml 和 1p.env
+
 ## 适用场景
 
 适合这种场景：

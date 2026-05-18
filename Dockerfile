@@ -45,7 +45,9 @@ COPY conf/ols/vhosts/vhconf.conf /usr/local/lsws/conf/vhosts/Example/vhconf.conf
 RUN set -eux; \
     sed -i 's/\r$//' /usr/local/bin/ols-wp-entrypoint /docker-entrypoint-initdb.d/init.sql; \
     chmod +x /usr/local/bin/ols-wp-entrypoint; \
-    chown nobody:nogroup ${WP_ROOT}/.htaccess || chown nobody:nobody ${WP_ROOT}/.htaccess
+    chown nobody:nogroup ${WP_ROOT}/.htaccess || chown nobody:nobody ${WP_ROOT}/.htaccess; \
+    ln -sf /dev/stdout /usr/local/lsws/logs/access.log; \
+    ln -sf /dev/stderr /usr/local/lsws/logs/error.log
 
 EXPOSE 80 7080
 

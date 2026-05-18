@@ -4,7 +4,7 @@ set -eu
 WP_ROOT="${WP_ROOT:-/var/www/vhosts/localhost/html}"
 WP_CONFIG="${WP_ROOT}/wp-config.php"
 WP_CONFIG_SAMPLE="${WP_ROOT}/wp-config-sample.php"
-WP_INIT_FLAG="${WP_ROOT}/.ols-wp-initialized"
+DB_INIT_FLAG="${WP_ROOT}/.ols-wp-db-initialized"
 OLS_WP_TEST_MODE="${OLS_WP_TEST_MODE:-0}"
 
 # default values
@@ -310,40 +310,52 @@ if [ "$OLS_WP_TEST_MODE" != "1" ]; then
   check_database_connection
 fi
 
-if [ ! -f "$WP_INIT_FLAG" ]; then
-  if [ "$OLS_WP_TEST_MODE" != "1" ]; then
-    initialize_database
-  else
-    log "starting WordPress initialization test mode"
+# 首次启动：从 sample 创建 wp-config.php
+if [ ! -f "$WP_CONFIG" ]; then
+  log "first-time setup: creating wp-config.php from sample"
+
+  if [ ! -f "$WP_CONFIG_SAMPLE" ]; then
+    printf '[ols-wp] ERROR: wp-config-sample.php not found: %s\n' "$WP_CONFIG_SAMPLE" >&2
+    exit 1
   fi
-  log "starting WordPress initialization"
 
-  WP_CONFIG_FINAL="$WP_CONFIG"
-  WP_CONFIG_TMP="${WP_CONFIG_FINAL}.tmp"
-  rm -f "$WP_CONFIG_TMP"
-  cp "$WP_CONFIG_SAMPLE" "$WP_CONFIG_TMP"
-  WP_CONFIG="$WP_CONFIG_TMP"
-
-  set_config_value DB_NAME "$WORDPRESS_DB_NAME"
-  set_config_value DB_USER "$WORDPRESS_DB_USER"
-  set_config_value DB_PASSWORD "$WORDPRESS_DB_PASSWORD"
-  set_config_value DB_HOST "$WORDPRESS_DB_HOST"
-  set_config_value DB_CHARSET "${WORDPRESS_DB_CHARSET:-$DEFAULT_DB_CHARSET}"
-  set_config_value DB_COLLATE "${WORDPRESS_DB_COLLATE:-}"
-
-  table_prefix_value="${WORDPRESS_TABLE_PREFIX:-$DEFAULT_TABLE_PREFIX}"
-  sed -i "s/^\$table_prefix *=.*/\$table_prefix = '${table_prefix_value}';/" "$WP_CONFIG"
-
-  set_config_raw WP_DEBUG "${WORDPRESS_DEBUG:-false}"
-
-  replace_managed_wp_config_block
-
-  mv "$WP_CONFIG_TMP" "$WP_CONFIG_FINAL"
-  WP_CONFIG="$WP_CONFIG_FINAL"
-  touch "$WP_INIT_FLAG"
-  log "WordPress initialization completed successfully"
+  cp "$WP_CONFIG_SAMPLE" "$WP_CONFIG"
+  log "wp-config.php created successfully"
 else
-  log "WordPress initialization skipped: initialization flag already exists"
+  log "wp-config.php already exists, updating configuration"
+fi
+
+# 每次启动都更新数据库连接配置
+log "updating database connection settings"
+set_config_value DB_NAME "$WORDPRESS_DB_NAME"
+set_config_value DB_USER "$WORDPRESS_DB_USER"
+set_config_value DB_PASSWORD "$WORDPRESS_DB_PASSWORD"
+set_config_value DB_HOST "$WORDPRESS_DB_HOST"
+set_config_value DB_CHARSET "${WORDPRESS_DB_CHARSET:-$DEFAULT_DB_CHARSET}"
+set_config_value DB_COLLATE "${WORDPRESS_DB_COLLATE:-}"
+
+table_prefix_value="${WORDPRESS_TABLE_PREFIX:-$DEFAULT_TABLE_PREFIX}"
+sed -i "s/^\$table_prefix *=.*/\$table_prefix = '${table_prefix_value}';/" "$WP_CONFIG"
+
+set_config_raw WP_DEBUG "${WORDPRESS_DEBUG:-false}"
+
+# 每次启动都更新受管配置块
+log "updating managed configuration block"
+replace_managed_wp_config_block
+
+# 只在首次启动时导入数据库
+if [ ! -f "$DB_INIT_FLAG" ]; then
+  if [ "$OLS_WP_TEST_MODE" != "1" ]; then
+    log "first-time database initialization"
+    initialize_database
+    touch "$DB_INIT_FLAG"
+    log "database initialization completed"
+  else
+    log "test mode: skipping database initialization"
+    touch "$DB_INIT_FLAG"
+  fi
+else
+  log "database already initialized, skipping SQL import"
 fi
 
 if command -v chown >/dev/null 2>&1; then
