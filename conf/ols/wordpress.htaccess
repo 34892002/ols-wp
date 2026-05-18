@@ -1,3 +1,6 @@
+# Character encoding
+AddDefaultCharset UTF-8
+
 # BEGIN WordPress
 <IfModule mod_rewrite.c>
 RewriteEngine On
@@ -10,9 +13,65 @@ RewriteRule . /index.php [L]
 </IfModule>
 # END WordPress
 
-# Basic hardening
-<FilesMatch "^(wp-config\.php|\.env|composer\.(json|lock)|package(-lock)?\.json)$">
-  Require all denied
-</FilesMatch>
+# ============================================
+# Security Hardening Rules
+# ============================================
 
-Options -Indexes
+# Block empty User-Agent
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} ^-$
+RewriteRule ^ - [F]
+</IfModule>
+
+# Block malicious bots and scanners
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} ^.*(?:acunetix|BLEXBot|domaincrawler\.com|LinkpadBot|MJ12bot/v|majestic12\.co\.uk|AhrefsBot|TwengaBot|SemrushBot|nikto|winhttp|Xenu\s+Link\s+Sleuth|Baiduspider|HTTrack|clshttp|harvest|extract|grab|miner|python-requests).*$ [NC]
+RewriteRule .* - [F,L]
+</IfModule>
+
+# Block access to hidden files, backups, sensitive docs and XMLRPC
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule (^\.) - [F,L]
+RewriteRule ^(readme|license|legalnotice|example|installation|changelog|README|LICENSE|LEGALNOTICE|EXAMPLE|INSTALLATION|CHANGELOG)\.(txt|html|md)$ - [F,L]
+RewriteRule \.(old|orig|original|php#|php~|php_bak|save|swo|aspx?|tpl|sh|bash|bak?|cfg|cgi|dll|exe|git|hg|ini|jsp|log|mdb|out|sql|svn|swp|tar|rdf)$ - [F,L]
+RewriteRule ^xmlrpc.php - [F,L]
+RewriteRule ^wp-content/uploads/.*\.php$ - [F,L]
+RewriteRule (&pws=0|_vti_|\(null\)|\{$itemURL\}|echo(.*)kae|boot\.ini|etc/passwd|eval\(|self/environ|cgi-|muieblack) - [F,L]
+RewriteRule \.(psd|cmd|bat|csh)$ - [F,L]
+</IfModule>
+
+# Protect WordPress core directories
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^wp-admin/includes/ - [F,L]
+RewriteRule !^wp-includes/ - [S=3]
+RewriteRule ^wp-includes/[^/]+\.php$ - [F,L]
+RewriteRule ^wp-includes/js/tinymce/langs/.+\.php - [F,L]
+RewriteRule ^wp-includes/theme-compat/ - [F,L]
+RewriteRule ^wp-includes/[^/]+\.xml$ - [F,L]
+</IfModule>
+
+# Prevent user enumeration and script injection
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{QUERY_STRING} author=d
+RewriteRule ^ /? [L,R=301]
+RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|[|%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|[|%[0-9A-Z]{0,2})
+RewriteRule ^(.*)$ index.php [F,L]
+</IfModule>
+
+# ============================================
+# OpenLiteSpeed 兼容的敏感文件保护 (替代 FilesMatch)
+# ============================================
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/(wp-config\.php|\.env|composer\.json|composer\.lock|package\.json|package-lock\.json) [NC]
+RewriteRule .* - [F,L]
+</IfModule>

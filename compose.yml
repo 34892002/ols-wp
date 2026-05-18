@@ -3,6 +3,7 @@ services:
     build:
       context: .
       args:
+        OLS_VERSION: ${OLS_VERSION:-1.9.0-lsphp85}
         WORDPRESS_TEMPLATE: ${WORDPRESS_TEMPLATE:-template/latest.tar.gz}
         WORDPRESS_TEMPLATE_SQL: ${WORDPRESS_TEMPLATE_SQL:-sql/latest.sql}
     image: ${IMAGE_NAME:-ols-wp:latest}
@@ -17,6 +18,12 @@ services:
     volumes:
       - wordpress-data:/var/www/vhosts/localhost/html
       - wordpress-log:/usr/local/lsws/logs
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'      # 最高占用 1.5 个核心
+          memory: 600m     # 最高占用 600m
 
 volumes:
   wordpress-data:
+  wordpress-log:

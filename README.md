@@ -24,6 +24,27 @@
 - 希望使用预先准备好的 WordPress 模板包
 - 不想手动维护 `wp-config.php`
 
+## 模板说明
+
+> 模版只能使用.tar.gz格式压缩，根目录必须是 wordpress，否则解压异常目录错乱。
+
+**请登录后马上修改模板的默认用户名密码**
+
+> wp后台
+- 用户名: demo
+- 密码：demo
+- 密码串：$wp$2y$12$HexwVzImup4hTpjKppj43eR7T8FlQDOP0Yz8QKplYDxjCxQvMF1sS
+
+> ols后台
+- 用户名: demo
+- 密码：123456
+- `/usr/local/lsws/admin/misc/admpass.sh` 修改账号密码
+
+### 模板列表
+
+1. latest模板，官方6.9.4 纯净版
+2. woostify模板，主题使用woostify，已经安装好基础插件
+
 ## 项目文件
 
 - `Dockerfile`：构建 OpenLiteSpeed + LSPHP + WordPress 镜像
@@ -255,18 +276,3 @@ WordPress 会识别当前请求为 HTTPS，避免后台跳转、混合内容、C
 3. `WORDPRESS_TEMPLATE` 和 `WORDPRESS_TEMPLATE_SQL` 路径必须使用正斜杠 `/`（Unix 风格），例如 `template/woostify.tar.gz`，不要使用反斜杠 `\`。
 4. 模板包必须使用 `.tar.gz` 格式压缩，且解压后的根目录必须是 `wordpress`，否则会导致目录结构错乱。
 5. `litespeedtech/openlitespeed:1.9.0-lsphp85` 自带默认 OLS 配置。本项目目前仍复用基础镜像默认 listener/vhost，如果你需要完全可控的 OLS 站点配置，后续应显式接管 OLS 配置。
-
-## 模板说明
-
-> 模版只能使用.tar.gz格式压缩，根目录必须是 wordpress，否则解压异常目录错乱。
-
-**请登录后马上修改模板的默认用户名密码**
-
-- 用户名: demo
-- 密码：demo
-- 密码串：$wp$2y$12$HexwVzImup4hTpjKppj43eR7T8FlQDOP0Yz8QKplYDxjCxQvMF1sS
-
-### 模板列表
-
-1. latest模板，官方6.9.4 纯净版
-2. woostify模板，主题使用woostify，已经安装好基础插件
