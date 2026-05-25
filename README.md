@@ -15,7 +15,7 @@
 
 ## 单独编译docker
 ```bash
-docker build \
+docker build --no-cache \
   --build-arg OLS_VERSION=1.9.0-lsphp85 \
   --build-arg WORDPRESS_TEMPLATE=template/woostify.tar.gz \
   --build-arg WORDPRESS_TEMPLATE_SQL=sql/woostify.sql \

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-WP_ROOT="${WP_ROOT:-/var/www/vhosts/localhost/html}"
+WP_ROOT="${WP_ROOT:-/var/www/vhosts/wp/html}"
 WP_CONFIG="${WP_ROOT}/wp-config.php"
 WP_CONFIG_SAMPLE="${WP_ROOT}/wp-config-sample.php"
 DB_INIT_FLAG="${WP_ROOT}/.ols-wp-db-initialized"

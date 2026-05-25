@@ -16,7 +16,7 @@ services:
       # OpenLiteSpeed WebAdmin，生产环境建议不要暴露到公网
       - "${OLS_ADMIN_PORT:-7080}:7080"
     volumes:
-      - wp-data:/var/www/vhosts/localhost/html
+      - wp-data:/var/www/vhosts/wp/html
       - wp-log:/usr/local/lsws/logs
     deploy:
       resources:
