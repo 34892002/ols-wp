@@ -1,5 +1,5 @@
 # Build arguments
-ARG OLS_VERSION
+ARG OLS_VERSION=1.9.0-lsphp85
 FROM litespeedtech/openlitespeed:${OLS_VERSION}
 
 ARG WORDPRESS_TEMPLATE
