@@ -17,7 +17,7 @@ services:
       - "${OLS_ADMIN_PORT:-7080}:7080"
     volumes:
       - wp-data:/var/www/vhosts/wp/html
-      - wp-log:/usr/local/lsws/logs
+      - wp-log:/var/www/vhosts/wp/logs
     deploy:
       resources:
         limits:
